@@ -1,3 +1,5 @@
+### Script to monitor Mesh WiFi Extenders ###
+
 filename="$HOME/monitor_mesh_$(hostname).csv"
 
 echo "Monitor script started at $(date)" >> $filename
