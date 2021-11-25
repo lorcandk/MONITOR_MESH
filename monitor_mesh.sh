@@ -1,4 +1,5 @@
 ### Script to monitor Mesh WiFi Extenders ###
+### Read list of extenders.txt
 
 filename="$HOME/monitor_mesh_$(hostname).csv"
 
