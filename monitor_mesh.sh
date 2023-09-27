@@ -33,7 +33,7 @@ gw_wlan0=$(ip route list dev wlan0 | awk ' /^default/ {print $3}')
 #ip_8750=$(/usr/sbin/arp -n | grep -i 08:d5:9d:fb:87:50 | /usr/bin/awk -F ' ' '{printf $1}')
 
 ip_8430=$(/usr/sbin/arp -n | grep -i 08:d5:9d:fb:84:30 | /usr/bin/awk -F ' ' '{printf $1}')
-ip_8440=$(/usr/sbin/arp -n | grep -i 80:d5:9d:fb:84:40 | /usr/bin/awk -F ' ' '{printf $1}')
+ip_8440=$(/usr/sbin/arp -n | grep -i 08:d5:9d:fb:84:40 | /usr/bin/awk -F ' ' '{printf $1}')
 ip_B840=$(/usr/sbin/arp -n | grep -i 20:9a:7d:fa:b8:40 | /usr/bin/awk -F ' ' '{printf $1}')
 ip_B878=$(/usr/sbin/arp -n | grep -i 20:9a:7d:fa:b8:78 | /usr/bin/awk -F ' ' '{printf $1}')
 
@@ -84,8 +84,7 @@ fi
 echo "$(date),$bssid,$essid,\
 $state_gw_ip,\
 $state_google_ip,$state_google_fqdn_v4,$state_google_fqdn_v6,\
-$state_ext_8430,$state_ext_8440,$state_ext_B840,\
-$state_ext_B878" >> $filename
+$state_ext_8430,$state_ext_8440,$state_ext_B840,$state_ext_B878" >> $filename
 
 sleep 10
 done
