@@ -4,6 +4,19 @@ filename="$HOME/monitor_mesh_$(hostname).csv"
 
 echo "Monitor script started at $(date)" >> $filename
 
+device_file=$1
+n=1
+while read line; do
+# reading each line
+echo "$n $line"
+device_mac=$line
+device_name="Ext_" & $(device_mac: -5)
+echo $device_name
+n=$((n+1))
+done < $device_file
+
+
+
 echo "Date,BSSID,ESSID,GW_IP,Google_IP,Google_FQDN_v4,Google_FQDN_v6,Ext_B840,Ext_8440,Ext_B840,Ext_B878" >> $filename
 
 while :; do
