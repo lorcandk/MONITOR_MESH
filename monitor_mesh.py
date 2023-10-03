@@ -18,7 +18,14 @@ def is_valid_ipv4(ip):
     return False
 
 ### Get Extender MAC addresses from file ###
-extenders_df = pd.read_csv('~/MONITOR_MESH/mesh_devices.csv')
+#extenders_df = pd.read_csv('~/MONITOR_MESH/mesh_devices.csv')
+
+with open('mesh_devices.txt','r') as file:
+   extenders = []
+   for line in file:
+       line = line.strip()
+       extenders.append(line)
+print(extenders)
 
 ### Define file to save results ###
 hostname = subprocess.check_output("hostname", shell=True, text=True)
@@ -27,9 +34,16 @@ result_file = "monitor_mesh_" + hostname.strip() + ".csv"
 ### Create headers in first row ###
 headers = "Date,BSSID,ESSID,GW_IP,Google_IP,Google_FQDN_v4,Google_FQDN_v6"
 
-for ind in extenders_df.index:
-   name = extenders_df['Name'][ind]
-   headers = headers + "," + name 
+#for ind in extenders_df.index:
+#   name = extenders_df['Name'][ind]
+#   headers = headers + "," + name 
+
+for i in extenders:
+   ext_name = "Ext_" + i[-5:]
+   ext_name = ext_name.replace(":", "")
+   headers = headers + "," + ext_name 
+
+print(headers)
 
 ### Open result file for appending ###
 f = open(result_file, 'a+')
@@ -70,10 +84,13 @@ while True:
    results = dt_string.strip() + "," + bssid.strip() + "," + essid.strip() + "," + state_gw_ip.strip() + "," + state_google_ip.strip() + "," + state_google_fqdn_v4.strip() + "," + state_google_fqdn_v6.strip() 
 
 ### Loop across extenders ###
-   for ind in extenders_df.index:
+#   for ind in extenders_df.index:
 
-      name = extenders_df['Name'][ind]
-      mac_address = extenders_df['MAC'][ind]
+#     name = extenders_df['Name'][ind]
+#     mac_address = extenders_df['MAC'][ind]
+
+   for i in extenders:
+      mac_address = i
 
 ### Get IP address from ARP table ###
       cmd = "/usr/sbin/arp -n | grep -i " + mac_address + " | /usr/bin/awk -F ' ' '{printf $1}'" 
