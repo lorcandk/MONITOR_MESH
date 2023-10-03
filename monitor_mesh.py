@@ -24,11 +24,13 @@ with open('mesh_devices.txt','r') as file:
    for line in file:
        line = line.strip()
        extenders.append(line)
+file.close()
 #print(extenders)
 
 ### Define file to save results ###
 hostname = subprocess.check_output("hostname", shell=True, text=True)
 result_file = "monitor_mesh_" + hostname.strip() + ".csv"
+print(result_file)
 
 ### Create headers in first row ###
 headers = "Date,BSSID,ESSID,GW_IP,Google_IP,Google_FQDN_v4,Google_FQDN_v6"
@@ -42,15 +44,20 @@ for i in extenders:
    ext_name = ext_name.replace(":", "")
    headers = headers + "," + ext_name 
 
-print(headers)
+#print(headers)
 
 ### Open result file for appending ###
 f = open(result_file, 'a+')
 f.write("\n")
 f.write(headers)
+f.close()
 
 ### Loop continuously ###
 while True:
+ 
+### Open result file for appending ###
+   f = open(result_file, 'a+')
+   f.write("\n")
 
 ### Run NMAP to populate ARP table
    os.system("/usr/bin/nmap -sP -n 192.168.1.1-253")
@@ -105,7 +112,5 @@ while True:
       results = results.strip() + "," + state.strip()
 
 ### Write results to file ###
-   f.write("\n")
    f.write(results)
-
-f.close()
+   f.close()
