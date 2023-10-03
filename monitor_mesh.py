@@ -33,7 +33,7 @@ result_file = "monitor_mesh_" + hostname.strip() + ".csv"
 print(result_file)
 
 ### Create headers in first row ###
-headers = "Date,BSSID,ESSID,GW_IP,Google_IP,Google_FQDN_v4,Google_FQDN_v6"
+headers = "Date,BSSID,ESSID,Signal,GW_IP,Google_IP,Google_FQDN_v4,Google_FQDN_v6"
 
 #for ind in extenders_df.index:
 #   name = extenders_df['Name'][ind]
@@ -65,10 +65,12 @@ while True:
 ### Get BSSID (Access Point MAC) and ESSID (WiFi network) ###
    bssid_cmd = "/sbin/iwgetid -a | /usr/bin/awk -F ': ' '{printf $2}'"
    essid_cmd = "/sbin/iwgetid | /usr/bin/awk -F ':' '{printf $2}'"
+   signal_cmd = "/sbin/iwconfig wlan0 | grep 'Signal level' | /usr/bin/awk -F '=-' '{print $2}'"
    gw_wlan0_cmd = "ip route list dev wlan0 | awk ' /^default/ {print $3}'"
 
    bssid = subprocess.check_output(bssid_cmd, shell=True, text=True)
    essid = subprocess.check_output(essid_cmd, shell=True, text=True)
+   signal = subprocess.check_output(signal_cmd, shell=True, text=True)
    gw_wlan0 = subprocess.check_output(gw_wlan0_cmd, shell=True, text=True)
 
 ### Ping Gateway and Google ###
@@ -87,7 +89,7 @@ while True:
    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
 ### Create row of results ###
-   results = dt_string.strip() + "," + bssid.strip() + "," + essid.strip() + "," + state_gw_ip.strip() + "," + state_google_ip.strip() + "," + state_google_fqdn_v4.strip() + "," + state_google_fqdn_v6.strip() 
+   results = dt_string.strip() + "," + bssid.strip() + "," + essid.strip() + "," + "-" + signal.strip() + "," + state_gw_ip.strip() + "," + state_google_ip.strip() + "," + state_google_fqdn_v4.strip() + "," + state_google_fqdn_v6.strip() 
 
 ### Loop across extenders ###
 #   for ind in extenders_df.index:
