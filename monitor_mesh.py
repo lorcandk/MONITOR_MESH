@@ -37,12 +37,12 @@ headers = "Date,BSSID,ESSID,Freq,Signal,GW_IP,Google_IP,Google_FQDN_v4,Google_FQ
 
 #for ind in extenders_df.index:
 #   name = extenders_df['Name'][ind]
-#   headers = headers + "," + name 
+#   headers = headers + "," + name
 
 for i in extenders:
    ext_name = "Ext_" + i[-5:]
    ext_name = ext_name.replace(":", "")
-   headers = headers + "," + ext_name 
+   headers = headers + "," + ext_name
 
 #print(headers)
 
@@ -54,18 +54,20 @@ f.close()
 
 ### Loop continuously ###
 while True:
- 
+
 ### Open result file for appending ###
    f = open(result_file, 'a+')
    f.write("\n")
 
 ### Run NMAP to populate ARP table
-   os.system("/usr/bin/nmap -sP -n 192.168.1.1-253")
+#   os.system("/usr/bin/nmap -sP -n 192.168.1.1-253")
+   nmap_cmd = "/usr/bin/nmap -sP -n 192.168.1.1-253"
+   subprocess.run(nmap_cmd, shell=True, text=True)
 
 ### Get BSSID (Access Point MAC) and ESSID (WiFi network) ###
    bssid_cmd = "/sbin/iwgetid -a | /usr/bin/awk -F ': ' '{printf $2}'"
    essid_cmd = "/sbin/iwgetid | /usr/bin/awk -F ':' '{printf $2}'"
-   signal_cmd = "/sbin/iwconfig wlan0 | grep 'Signal level' | /usr/bin/awk -F '=-' '{print $2}'"
+   signal_cmd = "/sbin/iwconfig wlan0 | grep 'Signal level' | /usr/bin/awk -F '=-' '{print $2}' | /usr/bin/awk -F ' dBm' '{print $1}'"
    freq_cmd = "/sbin/iwconfig wlan0 | grep 'Frequency' | /usr/bin/awk -F ' ' '{print $2}' | /usr/bin/awk -F ':' '{print $2}'"
    gw_wlan0_cmd = "ip route list dev wlan0 | /usr/bin/awk ' /^default/ {print $3}'"
 
@@ -91,7 +93,7 @@ while True:
    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
 ### Create row of results ###
-   results = dt_string.strip() + "," + bssid.strip() + "," + essid.strip() + "," + freq.strip() + "," + "-" + signal.strip() + "," + state_gw_ip.strip() + "," + state_google_ip.strip() + "," + state_google_fqdn_v4.strip() + "," + state_google_fqdn_v6.strip() 
+   results = dt_string.strip() + "," + bssid.strip() + "," + essid.strip() + "," + freq.strip() + "," + "-" + signal.strip() + "," + state_gw_ip.strip() + "," + state_google_ip.strip() + "," + state_google_fqdn_v4.strip() + "," + state_google_fqdn_v6.strip()
 
 ### Loop across extenders ###
 #   for ind in extenders_df.index:
@@ -103,7 +105,7 @@ while True:
       mac_address = i
 
 ### Get IP address from ARP table ###
-      cmd = "/usr/sbin/arp -n | grep -i " + mac_address + " | /usr/bin/awk -F ' ' '{printf $1}'" 
+      cmd = "/usr/sbin/arp -n | grep -i " + mac_address + " | /usr/bin/awk -F ' ' '{printf $1}'"
       ip_address = subprocess.check_output(cmd, shell=True, text=True)
 
 ### Ping extender ###
@@ -118,3 +120,4 @@ while True:
 ### Write results to file ###
    f.write(results)
    f.close()
+
