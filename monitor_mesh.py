@@ -25,7 +25,7 @@ with open('mesh_devices.txt','r') as file:
    for line in file:
        line = line.strip()
        extenders.append(line)
-print(extenders)
+#print(extenders)
 
 ### Define file to save results ###
 hostname = subprocess.check_output("hostname", shell=True, text=True)
