@@ -19,7 +19,11 @@ def is_valid_ipv4(ip):
 ### Get Extender MAC addresses from file ###
 #extenders_df = pd.read_csv('~/MONITOR_MESH/mesh_devices.csv')
 
-with open('mesh_devices.txt','r') as file:
+absolute_path = os.path.dirname(__file__)
+devices_file = absolute_path + "/mesh_devices.txt"
+
+#with open('./mesh_devices.txt','r') as file:
+with open(devices_file,'r') as file:
    extenders = []
    for line in file:
        line = line.strip()
