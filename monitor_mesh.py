@@ -22,7 +22,6 @@ def is_valid_ipv4(ip):
 absolute_path = os.path.dirname(__file__)
 devices_file = absolute_path + "/mesh_devices.txt"
 
-#with open('./mesh_devices.txt','r') as file:
 with open(devices_file,'r') as file:
    extenders = []
    for line in file:
@@ -33,7 +32,7 @@ file.close()
 
 ### Define file to save results ###
 hostname = subprocess.check_output("hostname", shell=True, text=True)
-result_file = "monitor_mesh_" + hostname.strip() + ".csv"
+result_file = absolute_path + "/monitor_mesh_" + hostname.strip() + ".csv"
 print(result_file)
 
 ### Create headers in first row ###
@@ -111,7 +110,7 @@ while True:
 ### Get IP address from ARP table ###
       cmd = "/usr/sbin/arp -n | grep -i " + mac_address + " | /usr/bin/awk -F ' ' '{printf $1}'"
       ip_address = subprocess.check_output(cmd, shell=True, text=True)
-
+      print(f"IP address is {ip_address}")
 ### Ping extender ###
       if is_valid_ipv4(ip_address):
          state_cmd = "ping -c 1 " + ip_address + " > /dev/null &&  echo 'up'  ||  echo 'down' "
