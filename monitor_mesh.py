@@ -36,7 +36,7 @@ result_file = absolute_path + "/monitor_mesh_" + hostname.strip() + ".csv"
 print(result_file)
 
 ### Create headers in first row ###
-headers = "Date,BSSID,ESSID,Freq,Signal,GW_IP,Google_IP,Google_FQDN_v4,Google_FQDN_v6"
+headers = "Date,BSSID,ESSID,Freq,Signal,Latency,GW_IP,Google_IP,Google_FQDN_v4,Google_FQDN_v6"
 
 #for ind in extenders_df.index:
 #   name = extenders_df['Name'][ind]
@@ -85,18 +85,20 @@ while True:
    state_google_ip_cmd = "ping -c 1 8.8.8.8 > /dev/null &&  echo 'up'  ||  echo 'down' "
    state_google_fqdn_v4_cmd = "ping -4 -c 1 google.ie > /dev/null &&  echo 'up'  ||  echo 'down' "
    state_google_fqdn_v6_cmd = "ping -6 -c 1 google.ie > /dev/null &&  echo 'up'  ||  echo 'down' "
+   latency_cmd = "ping -4 -c 1 www.google.com | grep -oP '.*time=\K\d+' "
 
    state_gw_ip = subprocess.check_output(state_gw_ip_cmd, shell=True, text=True)
    state_google_ip = subprocess.check_output(state_google_ip_cmd, shell=True, text=True)
    state_google_fqdn_v4 = subprocess.check_output(state_google_fqdn_v4_cmd, shell=True, text=True)
    state_google_fqdn_v6 = subprocess.check_output(state_google_fqdn_v6_cmd, shell=True, text=True)
+   latency = subprocess.check_output(latency_cmd, shell=True, text=True)
 
 ### Get time ###
    now = datetime.now()
    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
 ### Create row of results ###
-   results = dt_string.strip() + "," + bssid.strip() + "," + essid.strip() + "," + freq.strip() + "," + "-" + signal.strip() + "," + state_gw_ip.strip() + "," + state_google_ip.strip() + "," + state_google_fqdn_v4.strip() + "," + state_google_fqdn_v6.strip()
+   results = dt_string.strip() + "," + bssid.strip() + "," + essid.strip() + "," + freq.strip() + "," + "-" + signal.strip() + "," + latency.strip() + "," + state_gw_ip.strip() + "," + state_google_ip.strip() + "," + state_google_fqdn_v4.strip() + "," + state_google_fqdn_v6.strip()
 
 ### Loop across extenders ###
 #   for ind in extenders_df.index:
