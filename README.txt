@@ -26,3 +26,7 @@ start tmux session: tmux
 detach from tmux session: CTRL-D B
 reattach to tmux session: tmux a
 
+Add to crontab to run on boot:
+
+@reboot sleep 60 && /usr/bin/python3 /home/pi/MONITOR_MESH/monitor_mesh.py
+

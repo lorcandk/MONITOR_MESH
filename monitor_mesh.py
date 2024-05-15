@@ -87,11 +87,26 @@ while True:
    state_google_fqdn_v6_cmd = "ping -6 -c 1 google.ie > /dev/null &&  echo 'up'  ||  echo 'down' "
    latency_cmd = "ping -4 -c 1 www.google.com | grep -oP '.*time=\K\d+' "
 
-   state_gw_ip = subprocess.check_output(state_gw_ip_cmd, shell=True, text=True)
-   state_google_ip = subprocess.check_output(state_google_ip_cmd, shell=True, text=True)
-   state_google_fqdn_v4 = subprocess.check_output(state_google_fqdn_v4_cmd, shell=True, text=True)
-   state_google_fqdn_v6 = subprocess.check_output(state_google_fqdn_v6_cmd, shell=True, text=True)
-   latency = subprocess.check_output(latency_cmd, shell=True, text=True)
+   try:
+      state_gw_ip = subprocess.check_output(state_gw_ip_cmd, shell=True, text=True)
+   except:
+      state_gw_ip = "-"
+   try:
+      state_google_ip = subprocess.check_output(state_google_ip_cmd, shell=True, text=True)
+   except:
+      state_google_ip = "-"
+   try:
+      state_google_fqdn_v4 = subprocess.check_output(state_google_fqdn_v4_cmd, shell=True, text=True)
+   except:
+      state_google_fqdn_v4 = "-"
+   try:
+      state_google_fqdn_v6 = subprocess.check_output(state_google_fqdn_v6_cmd, shell=True, text=True)
+   except:
+      state_google_fqdn_v6 = "-"
+   try:
+      latency = subprocess.check_output(latency_cmd, shell=True, text=True)
+   except:
+      latency = "-"
 
 ### Get time ###
    now = datetime.now()
