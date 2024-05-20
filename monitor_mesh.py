@@ -30,9 +30,16 @@ with open(devices_file,'r') as file:
 file.close()
 #print(extenders)
 
+now = datetime.now() # current date and time
+year = now.strftime("%Y")
+month = now.strftime("%m")
+day = now.strftime("%d")
+time = now.strftime("%H:%M:%S")
+date_time = now.strftime("%Y%m%d%H%M%S")
+
 ### Define file to save results ###
 hostname = subprocess.check_output("hostname", shell=True, text=True)
-result_file = absolute_path + "/monitor_mesh_" + hostname.strip() + ".csv"
+result_file = absolute_path + "/monitor_mesh_" + hostname.strip() + "_" + date_time + ".csv"
 print(result_file)
 
 ### Create headers in first row ###
@@ -90,23 +97,28 @@ while True:
    try:
       state_gw_ip = subprocess.check_output(state_gw_ip_cmd, shell=True, text=True)
    except:
-      state_gw_ip = "-"
+      state_gw_ip = "down"
+      print(f"GW ping check error")
    try:
       state_google_ip = subprocess.check_output(state_google_ip_cmd, shell=True, text=True)
    except:
-      state_google_ip = "-"
+      state_google_ip = "down"
+      print(f"Google IP ping check error")
    try:
       state_google_fqdn_v4 = subprocess.check_output(state_google_fqdn_v4_cmd, shell=True, text=True)
    except:
-      state_google_fqdn_v4 = "-"
+      state_google_fqdn_v4 = "down"
+      print(f"Google FQDN ping check error")
    try:
       state_google_fqdn_v6 = subprocess.check_output(state_google_fqdn_v6_cmd, shell=True, text=True)
    except:
-      state_google_fqdn_v6 = "-"
+      state_google_fqdn_v6 = "down"
+      print(f"Google FQDN IPv6 ping check error")
    try:
       latency = subprocess.check_output(latency_cmd, shell=True, text=True)
    except:
       latency = "-"
+      print(f"Latency check error")
 
 ### Get time ###
    now = datetime.now()
@@ -116,24 +128,28 @@ while True:
    results = dt_string.strip() + "," + bssid.strip() + "," + essid.strip() + "," + freq.strip() + "," + "-" + signal.strip() + "," + latency.strip() + "," + state_gw_ip.strip() + "," + state_google_ip.strip() + "," + state_google_fqdn_v4.strip() + "," + state_google_fqdn_v6.strip()
 
 ### Loop across extenders ###
-#   for ind in extenders_df.index:
-
-#     name = extenders_df['Name'][ind]
-#     mac_address = extenders_df['MAC'][ind]
 
    for i in extenders:
       mac_address = i
 
 ### Get IP address from ARP table ###
       cmd = "/usr/sbin/arp -n | grep -i " + mac_address + " | /usr/bin/awk -F ' ' '{printf $1}'"
-      ip_address = subprocess.check_output(cmd, shell=True, text=True)
-      print(f"IP address is {ip_address}")
+      try:
+         ip_address = subprocess.check_output(cmd, shell=True, text=True)
+      except:
+         print(f"ARP error for {mac_address}")
+      print(f"IP address of {mac_address} is {ip_address}")
+
 ### Ping extender ###
       if is_valid_ipv4(ip_address):
          state_cmd = "ping -c 1 " + ip_address + " > /dev/null &&  echo 'up'  ||  echo 'down' "
-         state = subprocess.check_output(state_cmd, shell=True, text=True)
+         try:
+            state = subprocess.check_output(state_cmd, shell=True, text=True)
+         except:
+            print(f"ping error for {ip_address}")
       else:
-         state="NA"
+         print(f"Not valid IP address {ip_address}")
+         state="down"
 
       results = results.strip() + "," + state.strip()
 
