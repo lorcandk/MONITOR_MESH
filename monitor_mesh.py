@@ -40,7 +40,13 @@ date_time = now.strftime("%Y%m%d%H%M%S")
 ### Define file to save results ###
 hostname = subprocess.check_output("hostname", shell=True, text=True)
 result_file = absolute_path + "/monitor_mesh_" + hostname.strip() + "_" + date_time + ".csv"
-print(result_file)
+print(f"Creating result file {result_file}")
+
+#create symlink to new results file
+sym_link = absolute_path + "/monitor_mesh_" + hostname.strip() + ".csv"
+os.unlink(sym_link)
+os.symlink(result_file,sym_link)
+print(f"Creating sym link {sym_link} to {result_file}")
 
 ### Create headers in first row ###
 headers = "Date,BSSID,ESSID,Freq,Signal,Latency,GW_IP,Google_IP,Google_FQDN_v4,Google_FQDN_v6"
