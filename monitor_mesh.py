@@ -69,9 +69,15 @@ while True:
    f = open(result_file, 'a+')
    f.write("\n")
 
+### Check what subnet we are on ###
+   my_ip_cmd = "hostname -I" 
+   my_ip = subprocess.check_output(my_ip_cmd, shell=True, text=True)
+   my_octets = my_ip.split('.')
+   my_subnet = my_octets[0] + "." + my_octets[1] + "." + my_octets[2]
+   print(f"My subnet is {my_subnet}") 
+
 ### Run NMAP to populate ARP table
-#   os.system("/usr/bin/nmap -sP -n 192.168.1.1-253")
-   nmap_cmd = "/usr/bin/nmap -sP -n 192.168.1.1-253"
+   nmap_cmd = "/usr/bin/nmap -sP -n " + my_subnet + ".1-253"
    subprocess.run(nmap_cmd, shell=True, text=True)
 
 ### Get BSSID (Access Point MAC) and ESSID (WiFi network) ###
@@ -81,6 +87,7 @@ while True:
    freq_cmd = "/sbin/iwconfig wlan0 | grep 'Frequency' | /usr/bin/awk -F ' ' '{print $2}' | /usr/bin/awk -F ':' '{print $2}'"
    gw_wlan0_cmd = "ip route list dev wlan0 | /usr/bin/awk ' /^default/ {print $3}'"
 
+   print("Getting wifi info...")
    bssid = subprocess.check_output(bssid_cmd, shell=True, text=True)
    essid = subprocess.check_output(essid_cmd, shell=True, text=True)
    signal = subprocess.check_output(signal_cmd, shell=True, text=True)
@@ -88,18 +95,20 @@ while True:
    gw_wlan0 = subprocess.check_output(gw_wlan0_cmd, shell=True, text=True)
 
 ### Ping Gateway and Google ###
-   state_gw_ip_cmd = "ping -c 1 192.168.1.254 > /dev/null &&  echo 'up'  ||  echo 'down' "
+   state_gw_ip_cmd = "ping -c 1 " + my_subnet + ".254 > /dev/null &&  echo 'up'  ||  echo 'down' "
    state_google_ip_cmd = "ping -c 1 8.8.8.8 > /dev/null &&  echo 'up'  ||  echo 'down' "
    state_google_fqdn_v4_cmd = "ping -4 -c 1 google.ie > /dev/null &&  echo 'up'  ||  echo 'down' "
    state_google_fqdn_v6_cmd = "ping -6 -c 1 google.ie > /dev/null &&  echo 'up'  ||  echo 'down' "
    latency_cmd = "ping -4 -c 1 www.google.com | grep -oP '.*time=\K\d+' "
 
    try:
+      print(f"Running {state_gw_ip_cmd}")
       state_gw_ip = subprocess.check_output(state_gw_ip_cmd, shell=True, text=True)
    except:
       state_gw_ip = "down"
       print(f"GW ping check error")
    try:
+      print(f"Running {state_google_ip_cmd}")
       state_google_ip = subprocess.check_output(state_google_ip_cmd, shell=True, text=True)
    except:
       state_google_ip = "down"
